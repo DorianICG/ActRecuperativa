@@ -15,14 +15,14 @@ import java.util.Scanner;
 public class Estudiante {
     private Hashtable<Integer,Estudiante>estudiantes= new Hashtable<>();
     private String nombre;
-    private int edad,cantComidas, cantVerduras;
+    private int categoria,cantComidas, cantVerduras;
 
     public Estudiante() {
     }
 
-    public Estudiante(String nombre, int edad, int cantComidas, int cantVerduras) {
+    public Estudiante(String nombre, int categoria, int cantComidas, int cantVerduras) {
         this.nombre = nombre;
-        this.edad = edad;
+        this.categoria = categoria;
         this.cantComidas = cantComidas;
         this.cantVerduras = cantVerduras;
     }
@@ -35,8 +35,8 @@ public class Estudiante {
         return nombre;
     }
 
-    public int getEdad() {
-        return edad;
+    public int getCategoria() {
+        return categoria;
     }
 
     public int getCantComidas() {
@@ -55,8 +55,8 @@ public class Estudiante {
         this.nombre = nombre;
     }
 
-    public void setEdad(int edad) {
-        this.edad = edad;
+    public void setEdad(int categoria) {
+        this.categoria = categoria;
     }
 
     public void setCantComidas(int cantComidas) {
@@ -76,13 +76,13 @@ public class Estudiante {
                 System.out.println("""
                                    JOIN A OPTION TO STUDENT:
                                    
-                                   1.- CREATE
-                                   2.- PRINT
+                                   1.- PRINT BUENA ALIMENTACION
+                                   2.- PRINT ALIMENTACION BALANCEADA
                                    0.- BACK
                                    
                                    """);
                 option = scan.nextInt();
-                if(option<0|option>2)
+                if(option<0|option>3)
                 {
                     System.out.println("""
                                        
@@ -90,11 +90,11 @@ public class Estudiante {
                                        
                                        """);
                 }
-            }while(option<0|option>2);
+            }while(option<0|option>3);
             switch(option){
-                    case 1 -> createStudent();
-                    case 2 -> printStudents();  
-                    case 3 -> printGeneral();
+                    case 1 -> printGeneral("LA MEJOR Y PEOR CATEGORIA SON:");  
+                    case 2 -> printGeneral();
+                    case 3 -> printCategory();
                     case 0 -> System.out.print("\n\n\t------FIN-------");
                 
                     default -> {
@@ -111,130 +111,106 @@ public class Estudiante {
         }while(option!=0);
     }
 
-    public void createStudent(){
-        Scanner scan = new Scanner(System.in);
-        String newName;
-        int newEdad, newComidas = 0, newVerduras = 0;
+    public void createStudent(Estudiante nuevoEstudiante){
         int newID = estudiantes.size()+1;
-        System.out.print("Ingrese el nombre del estudiante: ");
-        newName = scan.next();
-        System.out.print("Ingrese la edad del estudiante: ");
-        newEdad = scan.nextInt();
-        if(newEdad<15 | newEdad>30){
-            System.out.print("HA INGRESADO UNA EDAD NO VALIDA");
-        }else{
-            System.out.print("Cuanta comida consume al dia?  ");
-            newComidas = scan.nextInt();
-            System.out.print("Cuanta contienen verduras?  ");
-            newVerduras = scan.nextInt();
-            if(newVerduras > newComidas){
-                System.out.print("NO PUEDE TENER CANTIDADES DE COMIDAS CON VERDURAS QUE SUPERE A LAS CANTIDADES DE COMIDA\n");
-            }else{
-                estudiantes.put(newID, new Estudiante(newName, newEdad, newComidas, newVerduras));
-            }
-        }
-        
-        
+        estudiantes.put(newID, nuevoEstudiante);
+            
     }
-
-    public boolean checkCreate(int idFound){
-        for(Map.Entry estudiante : estudiantes.entrySet()){
-            if(estudiante.getKey()==(Object)idFound){
-                return true;
-            }
-        }
-        return false;
-    }
-     
+        
     public void printGeneral(){
-        double promMejor=0, promPeor=0, promComida,catPeor=-1,catMejor=-1;
+        double promComida;
+        
         for(int i=0; i<3;i++){
-            promComida = checkProm(i)/contProm(i);
-            if(promMejor<promComida){
+            promComida=0;
+            switch (i) {
+                case 0 -> promComida += prom(i+1);
+                case 1 -> promComida += prom(i+1);
+                default -> promComida += prom(i+1);
+            }
+            promComida /= contador(i);
+            if(promComida>2){
+                System.out.println("Alimentación está balanceada de: "+promComida);
+            }else{
+                System.out.println("Alimentación está desbalanceada de: "+promComida);
+            }
+        }
+    }
+        
+    
+     
+    public void printGeneral(String mensaje){
+        double promMejor=0, promPeor=0, promComida;
+        int catPeor=-1,catMejor=-1;
+        System.out.print(mensaje+"\n");
+        for(int i=0; i<3;i++){
+            promComida = prom(i+1,0)/contador(i);
+            if(promMejor<promComida||catMejor==-1){
                 promMejor = promComida;
                 catMejor = i;
             }
-            if(promPeor>promComida){
-                promMejor = promComida;
-                catMejor = i;
+            if(promPeor>promComida||catPeor==-1){
+                promPeor = promComida;
+                catPeor = i;
             }
         }
         System.out.print("La PEOR categoria de estudiantes es la de ");
-        if(catPeor==0){
-            System.out.print("15 y 20 anyos \n");
-        }else if (catPeor==1){
-            System.out.print("21 y 25 anyos \n");
-        }else if (catPeor==2){
-            System.out.print("26 y 30 anyos \n");
-        }
-        System.out.print("La MEJOR categoria de estudiantes es la de ");
-        if(catMejor==0){
-            System.out.print("15 y 20 anyos \n");
-        }else if (catMejor==1){
-            System.out.print("21 y 25 anyos \n");
-        }else if (catMejor==2){
-            System.out.print("26 y 30 anyos \n");
-        }
-        promComida=0;
-        for(int i=0; i<3;i++){
-            if(i==0){
-                promComida += checkProm(15,20);
-            }else if (i==1){
-                promComida += checkProm(21,25);
-            }else{
-                promComida += checkProm(26,30);
+        switch (catPeor) {
+            case 0 -> System.out.print("15 y 20 anyos ");
+            case 1 -> System.out.print("21 y 25 anyos ");
+            case 2 -> System.out.print("26 y 30 anyos ");
+            default -> {
             }
-            promComida += checkProm(i);
         }
-        promComida= promComida/estudiantes.size();
-        if(promComida>2){
-            System.out.println("Alimentación está balanceada");
-        }else{
-            System.out.println("Alimentación está desbalanceada");
+        System.out.print("con un promedio de: "+promPeor+"\n\n");
+        System.out.print("La MEJOR categoria de estudiantes es la de ");
+        switch (catMejor) {
+            case 0 -> System.out.print("15 y 20 anyos ");
+            case 1 -> System.out.print("21 y 25 anyos ");
+            case 2 -> System.out.print("26 y 30 anyos ");
+            default -> {
+            }
         }
+        System.out.print("con un promedio de: "+promMejor+"\n");
+        
     }
     
-    public double checkProm(int i){
+    public double prom(int categoriaB, int i){
         int promedio=0;
         for(Integer id: estudiantes.keySet()){
                 Estudiante estudiante = estudiantes.get(id);
-                if(i==0&&(estudiante.edad>=15&&estudiante.edad<=20)){
-                    promedio+=estudiante.cantComidas;
-                }else if(i==1&&(estudiante.edad>=21&&estudiante.edad<=25)){
-                    promedio+=estudiante.cantComidas;
-                }else if(i==2&&(estudiante.edad>=26&&estudiante.edad<=30)){
+                if(categoriaB==estudiante.categoria){
                     promedio+=estudiante.cantComidas;
                 }
         }
         return promedio;
     }
     
-    public int checkProm(int min, int max){
+    public int prom(int categoriaB){
         int promedio=0;
         for(Integer id: estudiantes.keySet()){
                 Estudiante estudiante = estudiantes.get(id);
-                if(estudiante.edad>=min&&estudiante.edad<=max){
+                if(categoriaB==estudiante.categoria){
                     promedio+=estudiante.cantVerduras;
                 }
         }
         return promedio;
     }
-    public int contProm(int i){
+    public int contador(int i){
         int contador=0;
         for(Integer id: estudiantes.keySet()){
                 Estudiante estudiante = estudiantes.get(id);
-                if(i==0&&(estudiante.edad>=15|estudiante.edad<=20)){
-                    contador++;
-                }else if(i==1&&(estudiante.edad>=21|estudiante.edad<=25)){
-                    contador++;
-                }else if(i==2&&(estudiante.edad>=26|estudiante.edad<=30)){
-                    contador++;
+            switch (estudiante.categoria) {
+                case 0 -> contador++;
+                case 1 -> contador++;
+                case 2 -> contador++;
+                default -> {
                 }
+            }
         }
         return contador;
     }
     
-    public void printStudents(){
+    public void printCategory(){
         
         for(Integer id: estudiantes.keySet()){
             Estudiante estudiante = estudiantes.get(id);
@@ -242,7 +218,7 @@ public class Estudiante {
                                ---------------------------------------
                                ID ESTUDIANTE :"""+ id+"\n"
                               +"ESTUDIANTE :"+estudiante.nombre+"\n"
-                              +"EDAD :"+estudiante.edad+"\n"
+                              +"CATEGORIA :"+estudiante.categoria+"\n"
                               +"COMIDAS :"+estudiante.cantComidas+"\n"
                               +"COMIDAS CON VERDURAS :"+estudiante.cantVerduras+"\n"+
                                "---------------------------------------\n");
